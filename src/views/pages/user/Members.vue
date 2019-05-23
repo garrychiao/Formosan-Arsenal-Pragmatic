@@ -7,9 +7,8 @@
         <div class="avatar-small">
           <img src="@/assets/images/avatar.jpg" alt="avatar">
         </div>
-        <span>請填寫用戶資料</span>
+        <span>Dangelababy 的小天地</span>
       </div>
-      <!-- <div class="avatar"><img src="@/assets/images/avatar.jpg" alt="avatar"></div> -->
       <img
         src="@/assets/images/cover-2.jpg"
         id="color-thief"
@@ -18,109 +17,47 @@
       >
     </div>
     <el-row :gutter="12">
-      <el-col :span="20" :offset="1">
-        <el-form ref="form" :model="form" label-width="120px">
-          <el-form-item prop="name" label="姓名" :rules="requireRules">
-            <el-input v-model="form.name"></el-input>
-          </el-form-item>
-          <el-form-item
-            prop="email"
-            label="電子郵件"
-            :rules="[
-              { required: true, message: 'Please input email address', trigger: 'blur' },
-              { type: 'email', message: 'Please input correct email address', trigger: ['blur', 'change'] }
-            ]"
+      <el-col :span="24">
+        <el-table
+          ref="memberTable"
+          :data="tableData"
+          style="width: 100%">
+          <el-table-column
+            prop="date"
+            label="Date"
+            sortable
+            width="180"
+            column-key="date"
+            :filters="[{text: '2016-05-01', value: '2016-05-01'}, {text: '2016-05-02', value: '2016-05-02'}, {text: '2016-05-03', value: '2016-05-03'}, {text: '2016-05-04', value: '2016-05-04'}]"
+            :filter-method="filterHandler"
           >
-            <el-input v-model="form.email"></el-input>
-          </el-form-item>
-          <el-form-item label="國籍">
-            <el-select v-model="form.nationality" placeholder="Country">
-              <el-option
-                v-for="item in diaCodeOptions"
-                :key="item.countryName"
-                :label="item.countryName"
-                :value="item.countryName"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item prop="idNo" label="身分證號" :rules="requireRules">
-            <el-input v-model="form.idNo"></el-input>
-          </el-form-item>
-          <!-- img1 -->
-          <el-form-item>
-            <div class="upload-img-section">
-              <el-button type="info" plain @click="clickUploadImg('img1')">上傳證件正照</el-button>
-              <input
-                type="file"
-                accept="image/*"
-                @change="onFilePicked"
-                style="display: none;"
-                ref="img1"
-                name="img1"
-                id="imgFront"
-              >
-              <img
-                class="uploadedImg"
-                @click="handlePreview(img1Preview, '證件正照')"
-                :src="img1Preview"
-                alt
-              >
-            </div>
-          </el-form-item>
-          <!-- img2 -->
-          <el-form-item>
-            <div class="upload-img-section">
-              <el-button type="info" plain @click="clickUploadImg('img2')">上傳證件反照</el-button>
-              <input
-                type="file"
-                accept="image/*"
-                @change="onFilePicked"
-                style="display: none;"
-                ref="img2"
-                name="img2"
-                id="imgBack"
-              >
-              <img
-                class="uploadedImg"
-                @click="handlePreview(img2Preview, '證件反照')"
-                :src="img2Preview"
-                alt
-              >
-            </div>
-          </el-form-item>
-          <!-- img3 -->
-          <el-form-item>
-            <div class="upload-img-section">
-              <el-button type="info" plain @click="clickUploadImg('img3')">本人與證件自拍</el-button>
-              <input
-                type="file"
-                accept="image/*"
-                @change="onFilePicked"
-                style="display: none;"
-                ref="img3"
-                name="img3"
-                id="imgSelfie"
-              >
-              <img
-                class="uploadedImg"
-                @click="handlePreview(img3Preview, '本人與證件自拍')"
-                :src="img3Preview"
-                alt
-              >
-            </div>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="success" @click="onSubmit">新增完成</el-button>
-          </el-form-item>
-        </el-form>
+          </el-table-column>
+          <el-table-column
+            prop="name"
+            label="Name"
+            width="180">
+          </el-table-column>
+          <el-table-column
+            prop="address"
+            label="Address"
+            :formatter="formatter">
+          </el-table-column>
+          <el-table-column
+            prop="tag"
+            label="Tag"
+            width="100"
+            :filters="[{ text: 'Home', value: 'Home' }, { text: 'Office', value: 'Office' }]"
+            :filter-method="filterTag"
+            filter-placement="bottom-end">
+            <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.tag === 'Home' ? 'primary' : 'success'"
+                disable-transitions>{{scope.row.tag}}</el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-col>
     </el-row>
-    <el-dialog :title="previewImgName" :visible.sync="previewDialog" top="10vh">
-      <img style="width: 100%" :src="previewImg" alt>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="previewDialog = false">Close</el-button>
-      </span>
-    </el-dialog>
   </vue-scroll>
 </template>
 
@@ -134,130 +71,45 @@ export default {
   name: "Profile",
   data() {
     return {
-      registeredList: [],
-      //
-      diaCodeOptions: diaCodeList,
-      colorActive: false,
-      requireRules: [
-        {
-          required: true,
-          message: "Please input email address",
-          trigger: "blur"
-        }
-      ],
-      form: {
-        name: 'test',
-        email: 'test@gmail.com',
-        idNo: '1241242141212',
-        nationality: "Taiwan",
-      },
-      img1Preview: "",
-      img2Preview: "",
-      img3Preview: "",
-      previewDialog: false,
-      previewImg: "",
-      previewImgName: ""
+      tableData: [{
+        date: '2016-05-03',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+        tag: 'Home'
+      }, {
+        date: '2016-05-02',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+        tag: 'Office'
+      }, {
+        date: '2016-05-04',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+        tag: 'Home'
+      }, {
+        date: '2016-05-01',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+        tag: 'Office'
+      }],
     };
   },
   methods: {
-    onSubmit() {
-      // form validation
-      this.$refs['form'].validate((valid) => {
-        if (!valid) {
-          this.$notify({
-            title: "請檢查表單",
-            type: "error"
-          });
-          return;
-        } else {
-          if (this.checkForm()) {
-            this.form.phone = firebase.auth().currentUser.phoneNumber;
-            this.form.uid = firebase.auth().currentUser.uid;
-            this.submitForm();
-          }
-        }
-      });
+    resetDateFilter() {
+      this.$refs.filterTable.clearFilter('date');
     },
-    async submitForm () {
-      let formData = new FormData();
-
-      const imgFront = document.getElementById('imgFront').files[0];
-      const imgBack = document.getElementById('imgBack').files[0];
-      const imgSelfie = document.getElementById('imgSelfie').files[0];
-      console.log(imgFront)
-      formData.append('photos', imgFront)
-      formData.append('photos', imgBack)
-      formData.append('photos', imgSelfie)
-      for (let key in this.form) {
-        formData.append(key, this.form[key])
-      }
-      let res = await UserService.createUser(formData);
-      console.log(res.data)
+    clearFilter() {
+      this.$refs.filterTable.clearFilter();
     },
-    checkForm () {
-      // img
-      let imgFront = document.getElementById('imgFront').files[0]
-      let imgBack = document.getElementById('imgBack').files[0]
-      let imgSelfie = document.getElementById('imgSelfie').files[0]
-      if (!imgFront || !imgBack || !imgSelfie) {
-        this.$notify({
-          title: "請檢查照片上傳",
-          type: "error"
-        });
-        return false;
-      }
-      // find if input has been registered
-      let e = _.filter(this.registeredList, { 'email': this.form.email });
-      if (e.length > 0) {
-        this.$notify({
-          title: "Email 已被註冊",
-          type: "error"
-        });
-        return false;
-      }
-      let i = _.filter(this.registeredList, { 'idNo': this.form.idNo });
-      if (i.length > 0) {
-        this.$notify({
-          title: "ID 已被註冊",
-          type: "error"
-        });
-        return false;
-      }
-      return true
+    formatter(row, column) {
+      return row.address;
     },
-    clickUploadImg(ref) {
-      this.$refs[ref].click();
+    filterTag(value, row) {
+      return row.tag === value;
     },
-    onFilePicked(event) {
-      if (event.target.files[0].name.lastIndexOf(".") <= 0) {
-        this.$notify({
-          title: "Please add a valid file!",
-          type: "error"
-        });
-        return;
-      }
-      
-      const file = event.target.files[0];
-      const fileReader = new FileReader();
-      fileReader.addEventListener("load", () => {
-        if (event.target.name == "img1") {
-          this.img1Preview = fileReader.result;
-        }
-        if (event.target.name == "img2") {
-          this.img2Preview = fileReader.result;
-        }
-        if (event.target.name == "img3") {
-          this.img3Preview = fileReader.result;
-        }
-      });
-      if (file) {
-        fileReader.readAsDataURL(file);
-      }
-    },
-    handlePreview(url, label) {
-      this.previewDialog = true;
-      this.previewImg = url;
-      this.previewImgName = label;
+    filterHandler(value, row, column) {
+      const property = column['property'];
+      return row[property] === value;
     }
   },
   mounted() {
