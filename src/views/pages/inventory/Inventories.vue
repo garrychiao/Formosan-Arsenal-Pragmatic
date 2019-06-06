@@ -34,6 +34,39 @@
         Weight: {{ totalWeight }}
       </el-col>
     </el-row>
+    <br>
+    <el-row>
+      <el-col :span="8">
+        <el-button type="primary" @click="dialogVisible = true">
+          Udpate
+        </el-button>
+      </el-col>
+    </el-row>
+    <el-dialog
+      title="Update Inv"
+      :visible.sync="dialogVisible">
+      <el-row>
+        <el-col :span="8">
+          Item Name
+        </el-col>
+        <el-col :span="16">
+          <el-input type="text" v-model="form.item_name"></el-input>
+        </el-col>
+      </el-row>
+      <br>
+      <el-row>
+        <el-col :span="8">
+          Item Weight
+        </el-col>
+        <el-col :span="16">
+          <el-input type="numebr" v-model="form.unit_weight"></el-input>
+        </el-col>
+      </el-row>
+      
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="updateInv">Update</el-button>
+      </span>
+    </el-dialog>
   </vue-scroll>
 </template>
 
@@ -52,6 +85,8 @@ export default {
       selectedInv: {},
       unit: 0,
       totalWeight: 0,
+      dialogVisible: false,
+      form: {}
     };
   },
   methods: {
@@ -62,9 +97,27 @@ export default {
         let inventories = [];
         inventoriesRef.forEach(doc => {
           let item = doc.data();
+          item.docId = doc.id;
           inventories.push(item);
         });
         this.inventories = inventories;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async updateInv () {
+      try {
+        let db = firebase.firestore();
+        await db.collection('inventories').doc(this.selectedInv.docId).update({
+          unit_weight: this.form.unit_weight,
+        });
+
+        this.getInventories();
+        this.dialogVisible = false;
+        this.$notify({
+          title: 'success',
+          type: 'success'
+        });
       } catch (err) {
         console.log(err);
       }
@@ -85,6 +138,7 @@ export default {
       }
     },
     selectedInv: function () {
+      this.form = this.selectedInv;
       if (this.selectedInv.unit_weight) {
         let _unit = new Decimal(this.unit);
         this.totalWeight = parseFloat(_unit.times(parseFloat(this.selectedInv.unit_weight)));
@@ -108,7 +162,7 @@ export default {
   width: 50%;
 }
 .el-button {
-  float: left;
+  // float: left;
 }
 
 .page-profile {
