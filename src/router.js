@@ -4,6 +4,8 @@ import Router from 'vue-router';
 import Dashboard from './views/apps/Dashboard.vue';
 //
 import Members from './views/pages/user/Members';
+//
+import Inventories from './views/pages/inventory/Inventories.vue';
 
 import Profile from './views/pages/user/Profile.vue';
 import KYC from './views/pages/user/KYC.vue';
@@ -35,10 +37,19 @@ const router = new Router({
         layout: layouts.navLeft,
       },
     },
+    // {
+    //   path: '/members',
+    //   name: 'mambers',
+    //   component: Members,
+    //   meta: {
+    //     auth: true,
+    //     layout: layouts.navLeft,
+    //   },
+    // },
     {
-      path: '/members',
-      name: 'mambers',
-      component: Members,
+      path: '/inventories',
+      name: 'inventories',
+      component: Inventories,
       meta: {
         auth: true,
         layout: layouts.navLeft,

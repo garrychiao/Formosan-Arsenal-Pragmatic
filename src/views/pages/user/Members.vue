@@ -7,7 +7,8 @@
         <div class="avatar-small">
           <img src="@/assets/images/avatar.jpg" alt="avatar">
         </div>
-        <span>Dangelababy 的小天地</span>
+        <span>SMART PM</span>
+        <span style="color: white;">Dangelababy 的小天地</span>
       </div>
       <img
         src="@/assets/images/cover-2.jpg"
@@ -16,46 +17,214 @@
         alt="profile cover"
       >
     </div>
+    <el-row :gutter="15">
+      <el-col :span="6">
+        <el-button type="primary" @click="addMemberDialog = true">
+          Add
+        </el-button>
+      </el-col>
+      <el-col :span="6">
+        <el-input v-model="condition" placeholder="Condition"></el-input>
+      </el-col>
+      <el-col :span="6">
+        <el-input v-model="target" placeholder="Target"></el-input>
+      </el-col>
+      <el-col :span="6">
+        <!-- <el-button type="warning" @click="getMembers(condition, target)">
+          Filter
+        </el-button> -->
+      </el-col>
+    </el-row>
     <el-row :gutter="12">
       <el-col :span="24">
         <el-table
           ref="memberTable"
           :data="tableData"
-          style="width: 100%">
-          <el-table-column
-            prop="date"
-            label="Date"
-            sortable
-            width="180"
-            column-key="date"
-            :filters="[{text: '2016-05-01', value: '2016-05-01'}, {text: '2016-05-02', value: '2016-05-02'}, {text: '2016-05-03', value: '2016-05-03'}, {text: '2016-05-04', value: '2016-05-04'}]"
-            :filter-method="filterHandler"
+          style="width: 100%"
+          :default-sort = "{prop: 'name', order: 'descending'}"
           >
-          </el-table-column>
           <el-table-column
             prop="name"
             label="Name"
-            width="180">
+            sortable>
           </el-table-column>
           <el-table-column
-            prop="address"
-            label="Address"
-            :formatter="formatter">
+            prop="category"
+            label="Category">
           </el-table-column>
           <el-table-column
-            prop="tag"
-            label="Tag"
-            width="100"
-            :filters="[{ text: 'Home', value: 'Home' }, { text: 'Office', value: 'Office' }]"
-            :filter-method="filterTag"
-            filter-placement="bottom-end">
+            prop="contact"
+            label="Contact"
+            sortable>
+          </el-table-column>
+          <el-table-column
+            prop="remark"
+            label="Remark">
+          </el-table-column>
+          <el-table-column
+            prop="gallery"
+            label="Gallery">
+          </el-table-column>
+          <el-table-column
+            prop="skillList"
+            label="Skill List"
+            sortable="">
+          </el-table-column>
+          <el-table-column
+            prop="id"
+            label="Manipulate"
+            width="100">
             <template slot-scope="scope">
-              <el-tag
-                :type="scope.row.tag === 'Home' ? 'primary' : 'success'"
-                disable-transitions>{{scope.row.tag}}</el-tag>
+              <el-button @click="openEditMemberDialog(scope.row)" type="info" size="mini">
+                Edit
+              </el-button>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="id"
+            label="Manipulate"
+            width="100">
+            <template slot-scope="scope">
+              <el-button @click="deleteMember(scope.row.docId)" type="danger" size="mini">
+                Delete
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
+        <!-- add dialog -->
+        <el-dialog
+          title="Add Member"
+          :visible.sync="addMemberDialog"
+          width="60%"
+          center>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Name</span>
+                <el-input
+                  placeholder="Name"
+                  v-model="addMemberInfo.name">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Category</span>
+                <el-input
+                  placeholder="Category"
+                  v-model="addMemberInfo.category">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Contact</span>
+                <el-input
+                  placeholder="Contact"
+                  v-model="addMemberInfo.contact">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Remark</span>
+                <el-input
+                  placeholder="Remark"
+                  v-model="addMemberInfo.remark">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Gallery</span>
+                <el-input
+                  placeholder="Gallery"
+                  v-model="addMemberInfo.gallery">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Skill List</span>
+                <el-input
+                  placeholder="Skill List"
+                  v-model="addMemberInfo.skillList">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <el-button @click="addMemberDialog = false">Cancel</el-button>
+                <el-button type="primary" @click="addMember">Confirm</el-button>
+              </el-col>
+            </el-row>
+        </el-dialog>
+        <!-- edit dialog -->
+        <el-dialog
+          title="Edit Member"
+          :visible.sync="editMemberDialog"
+          width="60%"
+          center>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Name</span>
+                <el-input
+                  placeholder="Name"
+                  v-model="editMemberInfo.name">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Category</span>
+                <el-input
+                  placeholder="Category"
+                  v-model="editMemberInfo.category">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Contact</span>
+                <el-input
+                  placeholder="Contact"
+                  v-model="editMemberInfo.contact">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Remark</span>
+                <el-input
+                  placeholder="Remark"
+                  v-model="editMemberInfo.remark">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Gallery</span>
+                <el-input
+                  placeholder="Gallery"
+                  v-model="editMemberInfo.gallery">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <span class="demo-input-label">Skill List</span>
+                <el-input
+                  placeholder="Skill List"
+                  v-model="editMemberInfo.skillList">
+                </el-input>
+              </el-col>
+            </el-row>
+            <el-row class="addingForm">
+              <el-col>
+                <el-button @click="editMemberDialog = false">Cancel</el-button>
+                <el-button type="primary" @click="editMember(editMemberInfo.docId)">Confirm</el-button>
+              </el-col>
+            </el-row>
+        </el-dialog>
       </el-col>
     </el-row>
   </vue-scroll>
@@ -66,35 +235,128 @@ import { diaCodeList } from "@/utils/diaCode";
 import firebase from "firebase";
 import UserService from "@/services/UserService";
 import _ from "lodash";
+import swal from "sweetalert2";
 
 export default {
   name: "Profile",
   data() {
     return {
-      tableData: [{
-        date: '2016-05-03',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-        tag: 'Home'
-      }, {
-        date: '2016-05-02',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-        tag: 'Office'
-      }, {
-        date: '2016-05-04',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-        tag: 'Home'
-      }, {
-        date: '2016-05-01',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-        tag: 'Office'
-      }],
+      condition: '',
+      target: '',
+      addMemberInfo: {
+        name: '',
+        category: '',
+        contact: '',
+        remark: '',
+        gallery: '',
+        skillList: '',
+      },
+      editMemberInfo: {
+        name: '',
+        category: '',
+        contact: '',
+        remark: '',
+        gallery: '',
+        skillList: '',
+        docId: '',
+      },
+      editMemberDialog: false,
+      addMemberDialog: false,
+      tableData: [],
+      origianlTableData: [],
     };
   },
   methods: {
+    async addMember() {
+      if(this.addMemberInfo.name == '') {
+        swal('name cannot be empty', '', 'error');
+        return
+      }
+      const db = firebase.firestore();
+      try {
+        await db.collection('members').add(this.addMemberInfo);
+      } catch (err) {
+        console.log(err);
+      }
+      swal('Member Added', '', 'success');
+      // clear added info
+      this.addMemberDialog = false;
+      this.addMemberInfo = {
+        name: '',
+        category: '',
+        contact: '',
+        remark: '',
+        gallery: '',
+        skillList: '',
+        condition: '',
+        target: '',
+      };
+      await this.getMembers(this.condition, this.target);
+    },
+    async getMembers (condition = '', target = '') {
+      const db = firebase.firestore();
+      try {
+        let membersRef;
+        let members = [];
+        membersRef = await db.collection('members').get();
+        // if (condition && target) {
+        //   membersRef = await db.collection('members').where(condition, '==', target).get();
+        // } else {
+          
+        // }
+        membersRef.forEach(doc => {
+          let item = doc.data();
+          item.docId = doc.id;
+          members.push(item);
+        });
+        this.origianlTableData = members;
+        this.tableData = members;
+        // console.log(members);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    openEditMemberDialog(userData) {
+      this.editMemberInfo = userData;
+      this.editMemberDialog = true
+      console.log(userData);
+    },
+    async editMember (docId) {
+      try {
+        const db = firebase.firestore();
+        await db.collection('members').doc(docId).update(this.editMemberInfo);
+        swal('User updated', '', 'success');
+        this.editMemberDialog = false;
+        this.editMemberInfo = {
+          name: '',
+          category: '',
+          contact: '',
+          remark: '',
+          gallery: '',
+          skillList: '',
+          docId: '',
+        };
+        await this.getMembers(this.condition, this.target);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async deleteMember (docId) {
+      swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(async (result) => {
+        const db = firebase.firestore();
+        await db.collection('members').doc(docId).delete();
+        swal('Member deleted.' ,'', 'success');
+        this.getMembers(this.condition, this.target);
+      })
+    },
     resetDateFilter() {
       this.$refs.filterTable.clearFilter('date');
     },
@@ -104,29 +366,58 @@ export default {
     formatter(row, column) {
       return row.address;
     },
-    filterTag(value, row) {
-      return row.tag === value;
-    },
     filterHandler(value, row, column) {
       const property = column['property'];
       return row[property] === value;
     }
   },
   mounted() {
-    //
+    this.getMembers(this.condition, this.target);
   },
   beforeDestroy() {
     // window.removeEventListener('resize', this.resizeAffixEnabled);
   },
   components: {
     //
+  },
+  watch: {
+    target: function () {
+      if (!this.condition) {
+        return 
+      } else if (this.condition == 'skill list') {
+        this.condition = 'skillList'
+      }
+      if (!this.target) {
+        this.tableData = this.origianlTableData;
+        return
+      }
+      if (!(this.condition in this.origianlTableData[0])) {
+        return
+      }
+      let newTableData = this.origianlTableData.filter((obj) => {
+        if (obj[this.condition].includes(this.target)) {
+          return obj
+        }
+      });
+      console.log(newTableData);
+      this.tableData = newTableData;
+    }
   }
 };
 </script>
 
+<style>
+.swal2-container.swal2-shown {
+  z-index: 3000 !important;
+}
+</style>
+
 <style lang="scss" scoped>
 @import "../../../assets/scss/_variables";
 
+.addingForm {
+  margin: 15px 0;
+}
 .card-form {
   padding: 20px;
 }
@@ -134,9 +425,10 @@ export default {
   margin-left: 10px;
   width: 50%;
 }
-.el-button {
-  float: left;
-}
+
+// .el-button {
+//   float: left;
+// }
 
 .page-profile {
   overflow: auto;
@@ -354,16 +646,6 @@ export default {
 
     .info {
       padding: 8px 16px;
-    }
-  }
-}
-</style>
-
-<style lang="scss">
-.page-profile {
-  .el-tabs:not(.el-tabs--border-card) {
-    .el-tabs__item:not(.is-active) {
-      color: #32325d;
     }
   }
 }

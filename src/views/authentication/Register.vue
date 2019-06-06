@@ -44,14 +44,7 @@ export default {
     //
   },
   mounted() {
-    firebase.auth().useDeviceLanguage();
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-      "recaptcha-container"
-    );
-
-    window.recaptchaVerifier.render().then(widgetId => {
-      window.recaptchaWidgetId = widgetId;
-    });
+    //
   },
   methods: {
     async onSignUp() {

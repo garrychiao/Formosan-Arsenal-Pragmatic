@@ -13,8 +13,8 @@
 		<el-menu-item index="/">
 			<i class="mdi mdi-gauge"></i><span slot="title">Dashboard</span>
 		</el-menu-item>
-		<el-menu-item index="/members">
-			<i class="mdi mdi-gauge"></i><span slot="title">Members</span>
+		<el-menu-item index="/inventories">
+			<i class="mdi mdi-gauge"></i><span slot="title">Inventories</span>
 		</el-menu-item>
 		<!-- <el-menu-item index="/calendar">
 			<i class="mdi mdi-calendar"></i><span slot="title">Calendar</span>
