@@ -17,7 +17,7 @@
     "firebase": "^5.5.1",
     "flag-icon-css": "^3.2.1",
     "flex.box": "^3.4.4",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "mobile-detect": "^1.4.3",
     "moment": "^2.22.2",
     "perfect-scrollbar": "^1.4.0",
